@@ -357,31 +357,50 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
       ),
       
-      //CUERPO: Mantenemos el Logo de la Vaca, quitamos el botón
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            //LOGO vaca
-            FaIcon(FontAwesomeIcons.cow, size: 130, color: Colors.white24), 
-            
-            SizedBox(height: 30),
-            Text(
-              '¡Bienvenido!',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Sistema de Gestión Ganadera',
-              style: TextStyle(fontSize: 16, color: Colors.white70),
-            ),
-          ],
+     // Este es un ejemplo de cómo estructurar el body de tu pantalla principal
+body: Padding(
+  padding: const EdgeInsets.all(16.0), // Un pequeño margen alrededor
+  child: GridView.builder(
+    // crossAxisCount define cuántas columnas quieres. 2 hará que los recuadros sean más pequeños y estéticos.
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2, 
+      crossAxisSpacing: 16.0, // Espacio horizontal entre cuadros
+      mainAxisSpacing: 16.0,  // Espacio vertical entre cuadros
+    ),
+    // itemCount será la cantidad de terrenos que traigas de tu db_helper
+    itemCount: 4, // Ponemos 4 de ejemplo por ahora
+    itemBuilder: (context, index) {
+      return Card(
+        color: Colors.white,
+        elevation: 4, // Le da un toque de sombra para que resalte
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15), // Bordes redondeados
         ),
-      ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(15),
+          onTap: () {
+            // AQUÍ SUCEDE LA MAGIA AL PRESIONAR
+            // Por el momento, mostraremos un cuadro de diálogo (emergente) con los datos
+            _mostrarDatosDelPotrero(context, index);
+          },
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.landscape, size: 40, color: Colors.brown), // Un icono de terreno
+                SizedBox(height: 10),
+                Text(
+                  'Potrero', 
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  ),
+),
 
       //BOTÓN FLOTANTE (+): Esquina inferior derecha
       floatingActionButton: FloatingActionButton(
@@ -395,6 +414,36 @@ class HomeScreen extends StatelessWidget {
   }
 
   // Diseño de cada renglón del menú
+// Función para mostrar la ventana emergente con los datos
+void _mostrarDatosDelPotrero(BuildContext context, int index) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Datos del Potrero #${index + 1}'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Nombre: El Mezquite (Ejemplo)'),
+            Text('Hectáreas: 50 (Ejemplo)'),
+            Text('Tipo de Pasto: Estrella (Ejemplo)'),
+            // Aquí en el futuro conectaremos los datos reales de tu SQLite
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cerrar'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Cierra el cuadro emergente
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
   Widget _opcionMenu(BuildContext context, IconData icon, String texto, Widget pantalla) {
     return ListTile(
       leading: Container(
