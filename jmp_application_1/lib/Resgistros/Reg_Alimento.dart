@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RegistroAlimentoScreen extends StatelessWidget {
+class Reg_AlimentoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

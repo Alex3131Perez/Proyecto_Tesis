@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RegistroTrasladosScreen extends StatelessWidget {
+class Reg_TrasladosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

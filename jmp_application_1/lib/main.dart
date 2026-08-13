@@ -6,6 +6,8 @@ import 'Resgistros/Reg_Alimento.dart';
 import 'Resgistros/Reg_Rancho.dart';
 import 'Resgistros/Reg_Traslados.dart';
 import 'Resgistros/Reg_Venta.dart';
+import 'datebase/db_helper.dart';
+import 'Perfil_Rancho.dart'; // Ajusta la ruta si lo tienes en otra carpeta
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,9 +22,7 @@ void main() {
     ),
   );
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
@@ -166,7 +166,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Email", style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          "Email",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         SizedBox(height: 8),
                         TextFormField(
                           controller: _emailController,
@@ -176,9 +179,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             hintText: "ejemplo@correo.com",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -191,7 +199,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                         SizedBox(height: 16),
-                        Text("Contraseña", style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          "Contraseña",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         SizedBox(height: 8),
                         TextFormField(
                           controller: _passwordController,
@@ -202,12 +213,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             hintText: "••••••••",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _isObscure ? Icons.visibility_off : Icons.visibility,
+                                _isObscure
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                                 color: Colors.grey,
                               ),
                               onPressed: () {
@@ -239,7 +257,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: Text("Sign In", style: TextStyle(color: Colors.white)),
+                            child: Text(
+                              "Sign In",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ),
                         SizedBox(height: 15),
@@ -282,7 +303,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: () {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Pantalla de registro en desarrollo'),
+                                    content: Text(
+                                      'Pantalla de registro en desarrollo',
+                                    ),
                                     backgroundColor: Colors.blue,
                                   ),
                                 );
@@ -290,7 +313,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF2D2D2D),
                               ),
-                              child: Text("Registrate", style: TextStyle(color: Colors.white)),
+                              child: Text(
+                                "Registrate",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ],
@@ -341,110 +367,179 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  // Colores de tu marca JMP
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final Color darkCoffee = Color(0xFF3E2723);
   final Color mediumCoffee = Color(0xFF5D4037);
+
+  List<Map<String, dynamic>> misRanchos = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarRanchos();
+  }
+
+  Future<void> _cargarRanchos() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final data = await DBHelper().getAllRanchos();
+      setState(() {
+        misRanchos = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error BD: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: mediumCoffee, // Fondo Café JMP
+      backgroundColor: mediumCoffee,
       appBar: AppBar(
         title: Text('JMP Ganadera', style: TextStyle(color: Colors.white)),
         backgroundColor: darkCoffee,
-        automaticallyImplyLeading: false, // Sin flecha de regreso
+        automaticallyImplyLeading: false,
         elevation: 0,
       ),
-      
-     // Este es un ejemplo de cómo estructurar el body de tu pantalla principal
-body: Padding(
-  padding: const EdgeInsets.all(16.0), // Un pequeño margen alrededor
-  child: GridView.builder(
-    // crossAxisCount define cuántas columnas quieres. 2 hará que los recuadros sean más pequeños y estéticos.
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2, 
-      crossAxisSpacing: 16.0, // Espacio horizontal entre cuadros
-      mainAxisSpacing: 16.0,  // Espacio vertical entre cuadros
-    ),
-    // itemCount será la cantidad de terrenos que traigas de tu db_helper
-    itemCount: 4, // Ponemos 4 de ejemplo por ahora
-    itemBuilder: (context, index) {
-      return Card(
-        color: Colors.white,
-        elevation: 4, // Le da un toque de sombra para que resalte
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15), // Bordes redondeados
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(15),
-          onTap: () {
-            // AQUÍ SUCEDE LA MAGIA AL PRESIONAR
-            // Por el momento, mostraremos un cuadro de diálogo (emergente) con los datos
-            _mostrarDatosDelPotrero(context, index);
-          },
-          child: const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.landscape, size: 40, color: Colors.brown), // Un icono de terreno
-                SizedBox(height: 10),
-                Text(
-                  'Potrero', 
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-  ),
-),
-
-      //BOTÓN FLOTANTE (+): Esquina inferior derecha
+      body: isLoading
+          ? Center(child: CircularProgressIndicator(color: Colors.white))
+          : misRanchos.isEmpty
+          ? _construirVistaVacia()
+          : _construirCuadricula(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _mostrarMenuOpciones(context);
         },
-        backgroundColor: const Color.fromARGB(255, 0, 0, 0), 
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         child: Icon(Icons.add, color: Colors.white, size: 30),
       ),
     );
   }
 
-  // Diseño de cada renglón del menú
-// Función para mostrar la ventana emergente con los datos
-void _mostrarDatosDelPotrero(BuildContext context, int index) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Datos del Potrero #${index + 1}'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Nombre: El Mezquite (Ejemplo)'),
-            Text('Hectáreas: 50 (Ejemplo)'),
-            Text('Tipo de Pasto: Estrella (Ejemplo)'),
-            // Aquí en el futuro conectaremos los datos reales de tu SQLite
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cerrar'),
-            onPressed: () {
-              Navigator.of(context).pop(); // Cierra el cuadro emergente
-            },
+  Widget _construirVistaVacia() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FaIcon(FontAwesomeIcons.cow, size: 130, color: Colors.white24),
+          SizedBox(height: 30),
+          Text(
+            '¡Bienvenido!',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Sistema de Gestión Ganadera',
+            style: TextStyle(fontSize: 16, color: Colors.white70),
           ),
         ],
-      );
-    },
-  );
-}
+      ),
+    );
+  }
 
-  Widget _opcionMenu(BuildContext context, IconData icon, String texto, Widget pantalla) {
+  Widget _construirCuadricula() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 16.0,
+        ),
+        itemCount: misRanchos.length,
+        itemBuilder: (context, index) {
+          final rancho = misRanchos[index];
+          return Card(
+            color: Colors.white,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(15),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PerfilRanchoScreen(rancho: rancho),
+                  ),
+                );
+              },
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.landscape, size: 40, color: Colors.brown),
+                    SizedBox(height: 10),
+                    Text(
+                      rancho['nombre'] ?? 'Sin nombre',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _mostrarDatosDelPotrero(
+    BuildContext context,
+    Map<String, dynamic> rancho,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(rancho['nombre'] ?? 'Detalles'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Ubicación: ${rancho['ubicacion'] ?? 'N/A'}'),
+              Text('Hectáreas: ${rancho['hectareas'] ?? 'N/A'}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cerrar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _opcionMenu(
+    BuildContext context,
+    IconData icon,
+    String texto,
+    Widget pantalla,
+  ) {
     return ListTile(
       leading: Container(
         padding: EdgeInsets.all(8),
@@ -455,17 +550,17 @@ void _mostrarDatosDelPotrero(BuildContext context, int index) {
         child: Icon(icon, color: Color.fromARGB(255, 0, 0, 0)),
       ),
       title: Text(texto, style: TextStyle(fontWeight: FontWeight.w600)),
-      onTap: () {
+      onTap: () async {
         Navigator.pop(context);
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => pantalla),
         );
+        _cargarRanchos();
       },
     );
   }
 
-  // Lógica del Menú Desplegable
   void _mostrarMenuOpciones(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -481,18 +576,40 @@ void _mostrarDatosDelPotrero(BuildContext context, int index) {
           children: [
             Container(width: 40, height: 4, color: Colors.grey[300]),
             SizedBox(height: 20),
-
-            _opcionMenu(context, Icons.home_work, 'Registrar Rancho', RegistroRanchoScreen()),
-            _opcionMenu(context, Icons.grass, 'Registrar Alimento', RegistroAlimentoScreen()),
-            _opcionMenu(context, Icons.local_shipping, 'Registro de Traslados', RegistroTrasladosScreen()),
-            _opcionMenu(context, Icons.monetization_on, 'Registro de Venta', RegistroVentaScreen()),
-
+            _opcionMenu(
+              context,
+              Icons.home_work,
+              'Registrar Rancho',
+              Reg_RanchoScreen(),
+            ),
+            _opcionMenu(
+              context,
+              Icons.grass,
+              'Registrar Alimento',
+              Reg_AlimentoScreen(),
+            ),
+            _opcionMenu(
+              context,
+              Icons.local_shipping,
+              'Registro de Traslados',
+              Reg_TrasladosScreen(),
+            ),
+            _opcionMenu(
+              context,
+              Icons.monetization_on,
+              'Registro de Venta',
+              Reg_VentaScreen(),
+            ),
             Divider(thickness: 1),
-
             ListTile(
               leading: Icon(Icons.logout, color: Colors.redAccent),
-              title: Text('Cerrar Sesión',
-                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              title: Text(
+                'Cerrar Sesión',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
@@ -507,4 +624,3 @@ void _mostrarDatosDelPotrero(BuildContext context, int index) {
     );
   }
 }
-
