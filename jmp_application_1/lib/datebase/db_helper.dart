@@ -124,6 +124,8 @@ class DBHelper {
         nombre TEXT,
         ubicacion TEXT,
         hectareas INTEGER
+        propetario TEXT,
+        numero_animales INTEGER,
       )
     ''');
   }
