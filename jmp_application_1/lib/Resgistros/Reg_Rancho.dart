@@ -26,10 +26,10 @@ class _RegistroRanchoScreenState extends State<Reg_RanchoScreen> {
       appBar: AppBar(
         title: Text("Registrar Rancho", style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF3E2723),
-        iconTheme: IconThemeData(color: Colors.white), 
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0), 
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
@@ -38,17 +38,31 @@ class _RegistroRanchoScreenState extends State<Reg_RanchoScreen> {
                 Card(
                   color: Color(0xFF4E342E),
                   elevation: 5,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        _crearCampoTexto("Nombre del Propietario", TextInputType.name, _propietarioController),
+                        _crearCampoTexto(
+                          "Nombre del Propietario",
+                          TextInputType.name,
+                          _propietarioController,
+                        ),
                         SizedBox(height: 15),
                         // Este sí va a la BDD
-                        _crearCampoTexto("Nombre del Rancho", TextInputType.name, _nombreRanchoController),
+                        _crearCampoTexto(
+                          "Nombre del Rancho",
+                          TextInputType.name,
+                          _nombreRanchoController,
+                        ),
                         SizedBox(height: 15),
-                        _crearCampoTexto("Clave de UPP", TextInputType.text, _uppController),
+                        _crearCampoTexto(
+                          "Clave de UPP",
+                          TextInputType.text,
+                          _uppController,
+                        ),
                       ],
                     ),
                   ),
@@ -57,75 +71,116 @@ class _RegistroRanchoScreenState extends State<Reg_RanchoScreen> {
                 Card(
                   color: Color(0xFF4E342E),
                   elevation: 5,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         // Este sí va a la BDD
-                        _crearCampoTexto("Localizacion del Rancho", TextInputType.streetAddress, _ubicacionController),
+                        _crearCampoTexto(
+                          "Localizacion del Rancho",
+                          TextInputType.streetAddress,
+                          _ubicacionController,
+                        ),
                         SizedBox(height: 15),
-                        _crearCampoTexto("Municipio", TextInputType.text, _municipioController),
+                        _crearCampoTexto(
+                          "Municipio",
+                          TextInputType.text,
+                          _municipioController,
+                        ),
                         SizedBox(height: 15),
                         // Este sí va a la BDD
-                        _crearCampoTexto("Hectareas de Terreno", TextInputType.number, _hectareasController),
+                        _crearCampoTexto(
+                          "Hectareas de Terreno",
+                          TextInputType.number,
+                          _hectareasController,
+                        ),
                         SizedBox(height: 15),
-                        _crearCampoTexto("Numero de Animales", TextInputType.number, _animalesController),
+                        _crearCampoTexto(
+                          "Numero de Animales",
+                          TextInputType.number,
+                          _animalesController,
+                        ),
                       ],
                     ),
                   ),
                 ),
                 SizedBox(height: 30),
                 ElevatedButton(
-                  // 2. CAMBIAMOS EL BOTÓN para que guarde en SQLite
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      
-                      // Armamos el mapa con los datos que pide tu tabla 'ranchos'
-                      Map<String, dynamic> nuevoRancho = {
-                        'nombre': _nombreRanchoController.text,
-                        'ubicacion': _ubicacionController.text,
-                        // Convertimos el texto a número
-                        'hectareas': int.tryParse(_hectareasController.text) ?? 0, 
-                      };
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
 
-                      // Llamamos a tu DBHelper para insertar el dato
+                    final nuevoRancho = {
+                      'nombre': _nombreRanchoController.text.trim(),
+                      'ubicacion': _ubicacionController.text.trim(),
+                      'hectareas': int.tryParse(_hectareasController.text) ?? 0,
+                      'propietario': _propietarioController.text.trim(),
+                      'numero_animales':
+                          int.tryParse(_animalesController.text) ?? 0,
+                    };
+
+                    try {
                       await DBHelper().insertRancho(nuevoRancho);
 
+                      if (!mounted) return;
+
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text("Rancho guardado en la base de datos"),
                           backgroundColor: Colors.green,
                           duration: Duration(seconds: 2),
                         ),
                       );
 
-                      Future.delayed(Duration(seconds: 2), (){
-                         Navigator.pop(context);
-                      });
+                      await Future.delayed(const Duration(seconds: 2));
+
+                      if (!mounted) return;
+                      Navigator.pop(context);
+                    } catch (e) {
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Error al guardar el rancho: $e"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF3E2723),
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                 ),
-                 child: Text("Guardar", style: TextStyle(color: Colors.white, fontSize: 16)),
-                )
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    "Guardar",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
               ],
-            )
-          )
-        )
-      )
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   // 3. ACTUALIZAMOS ESTE MÉTODO para que reciba el controlador
-  Widget _crearCampoTexto(String etiqueta, TextInputType tipoTeclado, TextEditingController controlador) {
+  Widget _crearCampoTexto(
+    String etiqueta,
+    TextInputType tipoTeclado,
+    TextEditingController controlador,
+  ) {
     return TextFormField(
       controller: controlador, // Aquí asignamos el controlador
       keyboardType: tipoTeclado,
-      style: TextStyle(color: Colors.black), 
+      style: TextStyle(color: Colors.black),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Este dato es obligatorio';
@@ -133,13 +188,13 @@ class _RegistroRanchoScreenState extends State<Reg_RanchoScreen> {
         return null;
       },
       decoration: InputDecoration(
-        filled: true, 
-        fillColor: Colors.white, 
+        filled: true,
+        fillColor: Colors.white,
         hintText: etiqueta,
-        labelStyle: TextStyle(color: Colors.grey[800]), 
+        labelStyle: TextStyle(color: Colors.grey[800]),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide.none, 
+          borderSide: BorderSide.none,
         ),
       ),
     );

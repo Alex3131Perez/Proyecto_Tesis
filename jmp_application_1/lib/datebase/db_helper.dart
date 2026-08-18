@@ -62,12 +62,33 @@ class DBHelper {
   }
 
   Future<Database> _initDB() async {
-    String path = join(await getDatabasesPath(), 'jmp_ganadera.db');
+    String path = join(await getDatabasesPath(), 'jmp_ganadera_v3Y.db');
     return await openDatabase(
       path,
-      version: 1,
-      onCreate: _createDB, // Aquí llamamos a la función que crea las tablas
+      version: 2,
+      onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+  }
+
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      final columns = await db.rawQuery("PRAGMA table_info(ranchos)");
+
+      final existingColumns = columns
+          .map((column) => column['name'] as String)
+          .toList();
+
+      if (!existingColumns.contains('propietario')) {
+        await db.execute('ALTER TABLE ranchos ADD COLUMN propietario TEXT');
+      }
+
+      if (!existingColumns.contains('numero_animales')) {
+        await db.execute(
+          'ALTER TABLE ranchos ADD COLUMN numero_animales INTEGER',
+        );
+      }
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -122,10 +143,11 @@ class DBHelper {
       CREATE TABLE ranchos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT,
+        nombre_prop TEXT,
         ubicacion TEXT,
-        hectareas INTEGER
-        propetario TEXT,
-        numero_animales INTEGER,
+        hectareas INTEGER,
+        propietario TEXT,
+        numero_animales INTEGER
       )
     ''');
   }

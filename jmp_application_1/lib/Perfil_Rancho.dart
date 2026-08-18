@@ -11,8 +11,10 @@ class PerfilRanchoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Extraemos los datos para usarlos fácil
     final nombre = rancho['nombre'] ?? 'Sin nombre';
+    final nombre_prop = rancho['nombre de Propetario'] ?? 'Sin nombre';
     final ubicacion = rancho['ubicacion'] ?? 'Ubicación desconocida';
     final hectareas = rancho['hectareas']?.toString() ?? '0';
+    final clave_upp = rancho['clave de upp']?.toString() ?? '0';
 
     return Scaffold(
       backgroundColor: const Color(0xFF4E342E), // Fondo café oscuro
@@ -101,21 +103,37 @@ class PerfilRanchoScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      _crearFilaDato(
-                        Icons.person,
-                        "Dueño del Terreno",
-                        "Propietario Pendiente (Falta en BDD)",
-                      ),
+                      //Nombre del Rancho
+                      const Divider(),
+                      _crearFilaDato(Icons.man, "Nombre", nombre),
+                      //Ubicacion del Rancho
                       const Divider(),
                       _crearFilaDato(Icons.location_on, "Ubicación", ubicacion),
+                      //Numero de Hectareas
                       const Divider(),
-                      _crearFilaDato(Icons.map, "Hectáreas", "$hectareas "),
+                      _crearFilaDato(Icons.grass, "Hectáreas", "$hectareas "),
+                      //Numero de Animales
                       const Divider(),
                       _crearFilaDato(
                         Icons.pets,
-                        "Número de Animales",
-                        "0 (Falta en BDD)",
+                        "Numero de Animales",
+                        rancho['numero_animales']?.toString() ?? '0',
                       ),
+                      //Nombre del propietario
+                      const Divider(),
+                      _crearFilaDato(
+                        Icons.man,
+                        "Nombre de Propetario",
+                        nombre_prop,
+                      ),
+                      //Clave de UPP
+                      const Divider(),
+                      _crearFilaDato(
+                        Icons.numbers,
+                        "Clave de UPP",
+                        "$clave_upp ",
+                      ),
+                      //Municipío del rancho
                     ],
                   ),
                 ),
