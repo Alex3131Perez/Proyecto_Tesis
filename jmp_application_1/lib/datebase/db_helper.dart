@@ -61,8 +61,9 @@ class DBHelper {
     return _database!;
   }
 
+  //Reinicio de BDD
   Future<Database> _initDB() async {
-    String path = join(await getDatabasesPath(), 'jmp_ganadera_v3Y.db');
+    String path = join(await getDatabasesPath(), 'jmp_ganadera_v8.db');
     return await openDatabase(
       path,
       version: 2,
@@ -143,8 +144,9 @@ class DBHelper {
       CREATE TABLE ranchos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT,
-        nombre_prop TEXT,
+        clave_upp TEXT,
         ubicacion TEXT,
+        localidad TEX,
         hectareas INTEGER,
         propietario TEXT,
         numero_animales INTEGER
@@ -165,5 +167,10 @@ class DBHelper {
   Future<int> deleteRancho(int id) async {
     final db = await database;
     return await db.delete('ranchos', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateRancho(int id, Map<String, dynamic> rancho) async {
+    final db = await database;
+    return await db.update('ranchos', rancho, where: 'id = ?', whereArgs: [id]);
   }
 }

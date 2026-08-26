@@ -86,7 +86,7 @@ class _RegistroRanchoScreenState extends State<Reg_RanchoScreen> {
                         ),
                         SizedBox(height: 15),
                         _crearCampoTexto(
-                          "Municipio",
+                          "Localidad",
                           TextInputType.text,
                           _municipioController,
                         ),
@@ -114,13 +114,15 @@ class _RegistroRanchoScreenState extends State<Reg_RanchoScreen> {
                       return;
                     }
 
-                    final nuevoRancho = {
+                    Map<String, dynamic> nuevoRancho = {
                       'nombre': _nombreRanchoController.text.trim(),
                       'ubicacion': _ubicacionController.text.trim(),
+                      'localidad': _municipioController.text.trim(),
                       'hectareas': int.tryParse(_hectareasController.text) ?? 0,
                       'propietario': _propietarioController.text.trim(),
                       'numero_animales':
                           int.tryParse(_animalesController.text) ?? 0,
+                      'clave_upp': _uppController.text,
                     };
 
                     try {
