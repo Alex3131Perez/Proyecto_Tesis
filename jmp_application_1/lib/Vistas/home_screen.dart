@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
               context,
               Icons.grass,
               'Registrar Alimento',
-              Reg_AlimentoScreen(),
+              Reg_AlimentoScreen(ranchoId: 1),
             ),
             _opcionMenu(
               context,

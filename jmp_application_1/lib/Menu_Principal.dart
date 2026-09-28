@@ -34,7 +34,7 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
 
     try {
       // Llamada real a tu base de datos
-      final data = await DBHelper().getAllRanchos(); 
+      final data = await DBHelper().getAllRanchos();
 
       setState(() {
         misRanchos = data;
@@ -58,13 +58,13 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
         automaticallyImplyLeading: false,
         elevation: 0,
       ),
-      body: isLoading 
+      body: isLoading
           ? Center(child: CircularProgressIndicator(color: Colors.white))
-          : misRanchos.isEmpty 
-              // Si no hay nada guardado, mostramos la vaca
-              ? _construirVistaVacia()
-              // Si hay datos, mostramos la cuadrícula interactiva
-              : _construirCuadricula(),
+          : misRanchos.isEmpty
+          // Si no hay nada guardado, mostramos la vaca
+          ? _construirVistaVacia()
+          // Si hay datos, mostramos la cuadrícula interactiva
+          : _construirCuadricula(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _mostrarMenuOpciones(context);
@@ -85,10 +85,14 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
           SizedBox(height: 30),
           Text(
             '¡Bienvenido!',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           SizedBox(height: 10),
-            Text(
+          Text(
             'Sistema de Gestión Ganadera',
             style: TextStyle(fontSize: 16, color: Colors.white70),
           ),
@@ -113,7 +117,9 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
           return Card(
             color: Colors.white,
             elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
             child: InkWell(
               borderRadius: BorderRadius.circular(15),
               onTap: () {
@@ -128,7 +134,10 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
                     Text(
                       rancho['nombre'] ?? 'Sin nombre',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
                   ],
                 ),
@@ -141,7 +150,10 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
   }
 
   // Ventana emergente con los datos del rancho
-  void _mostrarDatosDelPotrero(BuildContext context, Map<String, dynamic> rancho) {
+  void _mostrarDatosDelPotrero(
+    BuildContext context,
+    Map<String, dynamic> rancho,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -169,23 +181,31 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
   }
 
   // Diseño del menú inferior
-  Widget _opcionMenu(BuildContext context, IconData icon, String texto, Widget pantalla) {
+  Widget _opcionMenu(
+    BuildContext context,
+    IconData icon,
+    String texto,
+    Widget pantalla,
+  ) {
     return ListTile(
       leading: Container(
         padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(color: Colors.brown[50], shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: Colors.brown[50],
+          shape: BoxShape.circle,
+        ),
         child: Icon(icon, color: Color.fromARGB(255, 0, 0, 0)),
       ),
       title: Text(texto, style: TextStyle(fontWeight: FontWeight.w600)),
       onTap: () async {
         Navigator.pop(context); // Cierra el menú inferior
-        
+
         // Navega a la pantalla y espera a que el usuario regrese
         await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => pantalla),
         );
-        
+
         // Al regresar, vuelve a consultar la BDD para refrescar la pantalla
         _cargarRanchos();
       },
@@ -208,10 +228,30 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
           children: [
             Container(width: 40, height: 4, color: Colors.grey[300]),
             SizedBox(height: 20),
-            _opcionMenu(context, Icons.home_work, 'Registrar Rancho', Reg_RanchoScreen()),
-            _opcionMenu(context, Icons.grass, 'Registrar Alimento', Reg_AlimentoScreen()),
-            _opcionMenu(context, Icons.local_shipping, 'Registro de Traslados', Reg_TrasladosScreen()),
-            _opcionMenu(context, Icons.monetization_on, 'Registro de Venta', Reg_VentaScreen()),
+            _opcionMenu(
+              context,
+              Icons.home_work,
+              'Registrar Rancho',
+              Reg_RanchoScreen(),
+            ),
+            _opcionMenu(
+              context,
+              Icons.grass,
+              'Registrar Alimento',
+              Reg_AlimentoScreen(ranchoId: 1),
+            ),
+            _opcionMenu(
+              context,
+              Icons.local_shipping,
+              'Registro de Traslados',
+              Reg_TrasladosScreen(),
+            ),
+            _opcionMenu(
+              context,
+              Icons.monetization_on,
+              'Registro de Venta',
+              Reg_VentaScreen(),
+            ),
           ],
         ),
       ),

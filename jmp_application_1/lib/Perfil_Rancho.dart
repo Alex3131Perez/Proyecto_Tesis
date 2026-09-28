@@ -115,7 +115,7 @@ class PerfilRanchoScreen extends StatelessWidget {
                       context,
                     ).copyWith(dividerColor: Colors.transparent),
                     child: ExpansionTile(
-                      initiallyExpanded: true,
+                      initiallyExpanded: false,
                       iconColor: Colors.brown,
                       collapsedBackgroundColor: Colors.brown[300],
                       leading: const Padding(

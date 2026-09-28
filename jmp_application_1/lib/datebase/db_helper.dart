@@ -66,7 +66,7 @@ class DBHelper {
     String path = join(await getDatabasesPath(), 'jmp_ganadera_v8.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -90,6 +90,27 @@ class DBHelper {
         );
       }
     }
+
+    if (oldVersion < 3) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS vacunas (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          arete_animal TEXT,
+          nombre_vacuna TEXT,
+          fecha_aplicacion TEXT,
+          es_caballo INTEGER DEFAULT 0
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS gestacion (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          arete_nombre TEXT,
+          fecha_gestacion TEXT,
+          fecha_nacimiento TEXT,
+          estado TEXT
+        )
+      ''');
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -101,7 +122,9 @@ class DBHelper {
         raza TEXT,
         fecha_nacimiento TEXT,
         peso_actual REAL,
-        estado TEXT
+        estado TEXT,
+        rancho_id INTEGER,
+        FOREIGN KEY (rancho_id) REFERENCES ranchos (id) ON DELETE CASCADE
       )
     ''');
 
@@ -111,7 +134,9 @@ class DBHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT,
         cantidad REAL,
-        costo_kilo REAL
+        costo_kilo REAL,
+        rancho_id INTEGER,
+        FOREIGN KEY (rancho_id) REFERENCES ranchos (id) ON DELETE CASCADE
       )
     ''');
 
@@ -123,7 +148,8 @@ class DBHelper {
         origen TEXT,
         destino TEXT,
         chofer TEXT,
-        fecha TEXT
+        fecha TEXT,
+        cantidad_animales INTEGER
       )
     ''');
 
@@ -152,6 +178,27 @@ class DBHelper {
         numero_animales INTEGER
       )
     ''');
+    //TABLA VACUNAS
+    await db.execute('''
+     CREATE TABLE vacunas(       
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        arete_animal TEXT,
+        nombre_vacuna TEXT,
+        fecha_aplicacion TEXT,
+        es_caballo INTEGER DEFAULT 0
+      )  
+    ''');
+
+    //TABLA GESTACIÓN
+    await db.execute('''
+      CREATE TABLE gestacion(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+        arete_nombre TEXT,
+        fecha_gestacion TEXT,
+        fecha_nacimiento TEXT,
+        estado TEXT
+      )
+ ''');
   }
 
   Future<List<Map<String, dynamic>>> getAllRanchos() async {
@@ -172,5 +219,47 @@ class DBHelper {
   Future<int> updateRancho(int id, Map<String, dynamic> rancho) async {
     final db = await database;
     return await db.update('ranchos', rancho, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> insertGanado(Map<String, dynamic> animal) async {
+    final db = await database;
+    return await db.insert('ganado', animal);
+  }
+
+  Future<List<Map<String, dynamic>>> getGanadoPorRancho(int ranchoId) async {
+    final db = await database;
+    return await db.query(
+      'ganado',
+      where: 'rancho_id = ?',
+      whereArgs: [ranchoId],
+    );
+  }
+
+  // ================= CRUD VACUNAS =================
+  Future<int> insertVacuna(Map<String, dynamic> vacuna) async {
+    final db = await database;
+    return await db.insert('vacunas', vacuna);
+  }
+
+  Future<List<Map<String, dynamic>>> getHistorialMedico(String arete) async {
+    final db = await database;
+    return await db.query(
+      'vacunas',
+      where: 'arete_animal = ?',
+      whereArgs: [arete],
+      orderBy: 'fecha_aplicacion DESC',
+    );
+  }
+
+  // ================= CRUD GESTACIÓN =================
+  Future<int> insertGestacion(Map<String, dynamic> gestacion) async {
+    final db = await database;
+    return await db.insert('gestacion', gestacion);
+  }
+
+  // ================= CRUD ALIMENTOS =================
+  Future<int> insertAlimento(Map<String, dynamic> alimento) async {
+    final db = await database;
+    return await db.insert('alimentos', alimento);
   }
 }
